@@ -2,224 +2,148 @@
 <html lang="fr">
 
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <title>PNT GPS</title>
+<meta charset="UTF-8">
 
-  <style>
+<meta name="viewport"
+content="width=device-width, initial-scale=1.0">
 
-    body {
-      margin:0;
-      padding:0;
-      font-family:Arial,sans-serif;
-      background:#050816;
-      color:white;
-    }
+<title>PNT GPS</title>
 
-    .container {
+<link
+rel="stylesheet"
+href="https://unpkg.com/leaflet/dist/leaflet.css"
+/>
 
-      max-width:900px;
-      margin:auto;
-      padding:30px;
-    }
+<script
+src="https://unpkg.com/leaflet/dist/leaflet.js">
+</script>
 
-    .card {
+<style>
 
-      background:#0F172A;
-      border-radius:30px;
-      padding:40px;
+body{
 
-      border:1px solid rgba(255,255,255,0.08);
+  margin:0;
+  font-family:Arial,sans-serif;
+  background:#050816;
+  color:white;
+}
 
-      box-shadow:
-        0 0 40px rgba(168,85,247,0.2);
-    }
+#map{
 
-    h1 {
+  height:60vh;
+  width:100%;
+}
 
-      font-size:60px;
+.panel{
 
-      margin-bottom:20px;
+  padding:25px;
+}
 
-      background:linear-gradient(
-        90deg,
-        #A855F7,
-        #EC4899
-      );
+h1{
 
-      -webkit-background-clip:text;
-      -webkit-text-fill-color:transparent;
-    }
+  font-size:42px;
 
-    p {
+  background:linear-gradient(
+    90deg,
+    #A855F7,
+    #EC4899
+  );
 
-      color:#CBD5E1;
+  -webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;
+}
 
-      line-height:1.7;
+.buttons{
 
-      font-size:18px;
-    }
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+  margin-top:20px;
+}
 
-    .stats {
+button{
 
-      display:grid;
+  border:none;
+  padding:16px 22px;
+  border-radius:14px;
+  color:white;
+  font-weight:bold;
+  cursor:pointer;
+}
 
-      grid-template-columns:
-        repeat(auto-fit,minmax(200px,1fr));
+.start{
+  background:#7C3AED;
+}
 
-      gap:20px;
+.pause{
+  background:#F59E0B;
+}
 
-      margin-top:40px;
-    }
+.stop{
+  background:#EF4444;
+}
 
-    .stat {
+.stats{
 
-      background:#111827;
+  margin-top:20px;
+  line-height:2;
+}
 
-      border-radius:20px;
-
-      padding:25px;
-    }
-
-    .label {
-
-      color:#94A3B8;
-
-      margin-bottom:10px;
-    }
-
-    .value {
-
-      font-size:34px;
-
-      font-weight:bold;
-    }
-
-    .buttons {
-
-      display:flex;
-
-      gap:15px;
-
-      flex-wrap:wrap;
-
-      margin-top:35px;
-    }
-
-    button {
-
-      border:none;
-
-      padding:18px 24px;
-
-      border-radius:16px;
-
-      color:white;
-
-      font-size:16px;
-
-      font-weight:bold;
-
-      cursor:pointer;
-    }
-
-    .start {
-      background:linear-gradient(
-        90deg,
-        #7C3AED,
-        #EC4899
-      );
-    }
-
-    .pause {
-      background:#F59E0B;
-    }
-
-    .resume {
-      background:#10B981;
-    }
-
-    .stop {
-      background:#EF4444;
-    }
-
-    #status {
-
-      margin-top:30px;
-
-      background:#111827;
-
-      padding:20px;
-
-      border-radius:18px;
-
-      color:#CBD5E1;
-    }
-
-  </style>
+</style>
 
 </head>
 
 <body>
 
-<div class="container">
+<div id="map"></div>
 
-  <div class="card">
+<div class="panel">
 
-    <h1>PNT GPS</h1>
+  <h1>PNT GPS</h1>
 
-    <p>
-      Système professionnel de suivi GPS des tournées.
-    </p>
+  <div class="buttons">
 
-    <div class="stats">
+    <button
+      class="start"
+      onclick="startTracking()">
 
-      <div class="stat">
-        <div class="label">Temps</div>
-        <div class="value" id="time">0 min</div>
-      </div>
+      Démarrer
 
-      <div class="stat">
-        <div class="label">Distance</div>
-        <div class="value" id="distance">0 km</div>
-      </div>
+    </button>
 
-      <div class="stat">
-        <div class="label">Vitesse</div>
-        <div class="value" id="speed">0 km/h</div>
-      </div>
+    <button
+      class="pause"
+      onclick="pauseTracking()">
 
-      <div class="stat">
-        <div class="label">Points GPS</div>
-        <div class="value" id="points">0</div>
-      </div>
+      Pause
 
-    </div>
+    </button>
 
-    <div class="buttons">
+    <button
+      class="stop"
+      onclick="stopTracking()">
 
-      <button class="start" onclick="startTracking()">
-        Démarrer
-      </button>
+      Terminer
 
-      <button class="pause" onclick="pauseTracking()">
-        Pause
-      </button>
+    </button>
 
-      <button class="resume" onclick="resumeTracking()">
-        Reprendre
-      </button>
+  </div>
 
-      <button class="stop" onclick="stopTracking()">
-        Terminer
-      </button>
+  <div class="stats">
 
-    </div>
+    Temps :
+    <span id="time">0 min</span>
 
-    <div id="status">
-      GPS inactif.
-    </div>
+    <br>
+
+    Distance :
+    <span id="distance">0 km</span>
+
+    <br>
+
+    Points GPS :
+    <span id="points">0</span>
 
   </div>
 
@@ -227,28 +151,67 @@
 
 <script>
 
+const map = L.map('map').setView(
+  [47.322,5.041],
+  13
+);
+
+L.tileLayer(
+  'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+  {
+    attribution:'© OpenStreetMap'
+  }
+).addTo(map);
+
+let polyline = L.polyline(
+  [],
+  {
+    color:'#A855F7',
+    weight:5
+  }
+).addTo(map);
+
 let tracking = false;
 let paused = false;
 let watchId = null;
 
 let startTime = null;
-let points = 0;
+
 let totalDistance = 0;
+let points = 0;
 
 let lastPosition = null;
 
-function calculateDistance(lat1, lon1, lat2, lon2) {
+function calculateDistance(lat1, lon1, lat2, lon2){
 
   const R = 6371;
 
-  const dLat = (lat2-lat1) * Math.PI / 180;
-  const dLon = (lon2-lon1) * Math.PI / 180;
+  const dLat =
+    (lat2-lat1) * Math.PI/180;
+
+  const dLon =
+    (lon2-lon1) * Math.PI/180;
 
   const a =
-    Math.sin(dLat/2) * Math.sin(dLat/2) +
-    Math.cos(lat1 * Math.PI/180) *
-    Math.cos(lat2 * Math.PI/180) *
-    Math.sin(dLon/2) * Math.sin(dLon/2);
+
+    Math.sin(dLat/2) *
+    Math.sin(dLat/2)
+
+    +
+
+    Math.cos(lat1*Math.PI/180)
+
+    *
+
+    Math.cos(lat2*Math.PI/180)
+
+    *
+
+    Math.sin(dLon/2)
+
+    *
+
+    Math.sin(dLon/2);
 
   const c =
     2 * Math.atan2(
@@ -259,37 +222,38 @@ function calculateDistance(lat1, lon1, lat2, lon2) {
   return R * c;
 }
 
-function updateTime() {
+function updateTime(){
 
   if(!tracking || paused) return;
 
   const seconds =
-    Math.floor((Date.now() - startTime) / 1000);
+    Math.floor(
+      (Date.now()-startTime)/1000
+    );
 
   const minutes =
-    Math.floor(seconds / 60);
+    Math.floor(seconds/60);
 
-  document.getElementById("time").innerText =
-    minutes + " min";
+  document.getElementById("time")
+    .innerText = minutes + " min";
 }
 
 setInterval(updateTime,1000);
 
-function startTracking() {
+function startTracking(){
 
   if(tracking) return;
 
   tracking = true;
+
   paused = false;
 
   startTime = Date.now();
 
-  document.getElementById("status").innerText =
-    "Tracking GPS actif...";
+  watchId =
+    navigator.geolocation.watchPosition(
 
-  watchId = navigator.geolocation.watchPosition(
-
-    async (position) => {
+    async(position)=>{
 
       if(paused) return;
 
@@ -299,35 +263,42 @@ function startTracking() {
       const lng =
         position.coords.longitude;
 
-      const speed =
-        position.coords.speed
-          ? (position.coords.speed * 3.6).toFixed(1)
-          : 0;
+      polyline.addLatLng([lat,lng]);
 
-      if(lastPosition) {
+      map.setView([lat,lng],17);
 
-        totalDistance += calculateDistance(
-          lastPosition.lat,
-          lastPosition.lng,
-          lat,
-          lng
-        );
+      if(lastPosition){
+
+        totalDistance +=
+          calculateDistance(
+
+            lastPosition.lat,
+            lastPosition.lng,
+
+            lat,
+            lng
+          );
       }
 
-      lastPosition = { lat, lng };
+      lastPosition = {
+        lat,
+        lng
+      };
 
       points++;
 
-      document.getElementById("distance").innerText =
-        totalDistance.toFixed(2) + " km";
+      document.getElementById(
+        "distance"
+      ).innerText =
+        totalDistance.toFixed(2)
+        + " km";
 
-      document.getElementById("speed").innerText =
-        speed + " km/h";
-
-      document.getElementById("points").innerText =
+      document.getElementById(
+        "points"
+      ).innerText =
         points;
 
-      await fetch("/gps", {
+      await fetch("/gps",{
 
         method:"POST",
 
@@ -339,9 +310,8 @@ function startTracking() {
 
           lat,
           lng,
-          speed,
-          points,
           distance:totalDistance,
+          points,
           timestamp:new Date()
 
         })
@@ -350,45 +320,37 @@ function startTracking() {
 
     },
 
-    (error) => {
+    (error)=>{
 
-      document.getElementById("status").innerText =
-        error.message;
+      alert(error.message);
+
     },
 
     {
+
       enableHighAccuracy:true,
       maximumAge:0,
       timeout:5000
+
     }
 
   );
 }
 
-function pauseTracking() {
+function pauseTracking(){
 
   paused = true;
-
-  document.getElementById("status").innerText =
-    "Tracking en pause.";
 }
 
-function resumeTracking() {
-
-  paused = false;
-
-  document.getElementById("status").innerText =
-    "Tracking repris.";
-}
-
-function stopTracking() {
+function stopTracking(){
 
   tracking = false;
 
-  navigator.geolocation.clearWatch(watchId);
+  navigator.geolocation.clearWatch(
+    watchId
+  );
 
-  document.getElementById("status").innerText =
-    "Mission terminée.";
+  alert("Mission terminée");
 }
 
 </script>
