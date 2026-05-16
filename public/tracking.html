@@ -420,7 +420,7 @@ button:hover{
       <div class="stat-card">
 
         <div class="stat-label">
-          Quartiers détectés
+          Zones détectées
         </div>
 
         <div class="stat-value" id="districts">
@@ -523,7 +523,7 @@ let lastPosition = null;
 
 let streets = new Set();
 
-let districts = new Set();
+let zones = new Set();
 
 function calculateDistance(
   lat1,
@@ -616,12 +616,86 @@ async function reverseGeocode(
       );
     }
 
+    const road =
+      (
+        data.address.road
+        ||
+        ""
+      ).toLowerCase();
+
     if(
-      data.address.suburb
+      road.includes("darcy")
+      ||
+      road.includes("république")
+      ||
+      road.includes("wilson")
+      ||
+      road.includes("monge")
     ){
 
-      districts.add(
-        data.address.suburb
+      zones.add(
+        "A - Centre-ville"
+      );
+    }
+
+    if(
+      road.includes("toison")
+      ||
+      road.includes("valmy")
+      ||
+      road.includes("europe")
+    ){
+
+      zones.add(
+        "B - Toison d'Or / Nord"
+      );
+    }
+
+    if(
+      road.includes("université")
+      ||
+      road.includes("mansart")
+      ||
+      road.includes("chu")
+    ){
+
+      zones.add(
+        "C - Université / Est"
+      );
+    }
+
+    if(
+      road.includes("talant")
+      ||
+      road.includes("fontaine")
+    ){
+
+      zones.add(
+        "D - Talant / Fontaine"
+      );
+    }
+
+    if(
+      road.includes("chenôve")
+      ||
+      road.includes("bourroches")
+      ||
+      road.includes("longvic")
+    ){
+
+      zones.add(
+        "E - Chenôve / Longvic"
+      );
+    }
+
+    if(
+      road.includes("quetigny")
+      ||
+      road.includes("chevigny")
+    ){
+
+      zones.add(
+        "F - Quetigny / Chevigny"
       );
     }
 
@@ -633,7 +707,7 @@ async function reverseGeocode(
     document.getElementById(
       "districts"
     ).innerText =
-      districts.size;
+      zones.size;
 
   }catch(e){
 
@@ -708,26 +782,6 @@ function startTracking(){
 
         totalDistance.toFixed(2)
         + " km";
-
-      await fetch("/gps",{
-
-        method:"POST",
-
-        headers:{
-          "Content-Type":
-          "application/json"
-        },
-
-        body:JSON.stringify({
-
-          lat,
-          lng,
-          distance:totalDistance,
-          timestamp:new Date()
-
-        })
-
-      });
 
     },
 
@@ -804,13 +858,13 @@ function stopTracking(){
       </div>`;
   });
 
-  let districtHtml = "";
+  let zonesHtml = "";
 
-  districts.forEach(d=>{
+  zones.forEach(zone=>{
 
-    districtHtml +=
+    zonesHtml +=
       `<div class="street-item">
-        • ${d}
+        • ${zone}
       </div>`;
   });
 
@@ -841,17 +895,17 @@ function stopTracking(){
     </p>
 
     <p>
-      Quartiers traversés :
-      ${districts.size}
+      Zones traversées :
+      ${zones.size}
     </p>
 
     <div class="street-list">
 
       <h3>
-        Quartiers détectés
+        Zones détectées
       </h3>
 
-      ${districtHtml}
+      ${zonesHtml}
 
     </div>
 
@@ -891,6 +945,11 @@ async function exportPDF(){
       "a4"
     );
 
+  doc.setFont(
+    "helvetica",
+    "bold"
+  );
+
   doc.setFontSize(24);
 
   doc.text(
@@ -899,7 +958,41 @@ async function exportPDF(){
     20
   );
 
-  doc.setFontSize(14);
+  doc.setFontSize(13);
+
+  doc.setFont(
+    "helvetica",
+    "normal"
+  );
+
+  doc.text(
+    "Résumé complet de tournée",
+    20,
+    32
+  );
+
+  const duration =
+    Math.floor(
+      (
+        Date.now()
+        -
+        startTime
+      )
+      /
+      1000
+      /
+      60
+    );
+
+  doc.text(
+    "Temps total : "
+    +
+    duration
+    +
+    " min",
+    20,
+    48
+  );
 
   doc.text(
     "Distance totale : "
@@ -908,7 +1001,7 @@ async function exportPDF(){
     +
     " km",
     20,
-    40
+    58
   );
 
   doc.text(
@@ -916,56 +1009,78 @@ async function exportPDF(){
     +
     streets.size,
     20,
-    52
+    68
   );
 
   doc.text(
-    "Quartiers traversés : "
+    "Zones détectées : "
     +
-    districts.size,
+    zones.size,
     20,
-    64
+    78
   );
 
-  const mapCanvas =
-    await html2canvas(
+  let zoneY = 92;
 
-      document.querySelector(
-        ".leaflet-map-pane"
-      ),
+  doc.setFont(
+    "helvetica",
+    "bold"
+  );
 
-      {
+  doc.text(
+    "Zones parcourues :",
+    20,
+    zoneY
+  );
 
-        useCORS:true
+  zoneY += 10;
 
-      }
+  doc.setFont(
+    "helvetica",
+    "normal"
+  );
 
+  zones.forEach(zone=>{
+
+    doc.text(
+      "• " + zone,
+      25,
+      zoneY
     );
 
-  const mapImage =
-    mapCanvas.toDataURL(
+    zoneY += 8;
+
+  });
+
+  const canvas =
+    await html2canvas(
+      document.getElementById("map"),
+      {
+        useCORS:true,
+        allowTaint:true
+      }
+    );
+
+  const imgData =
+    canvas.toDataURL(
       "image/png"
     );
 
   doc.addImage(
-
-    mapImage,
-
+    imgData,
     "PNG",
-
     15,
-
-    80,
-
+    120,
     180,
-
     90
-
   );
 
-  let y = 185;
+  let y = 225;
 
-  doc.setFontSize(16);
+  doc.setFont(
+    "helvetica",
+    "bold"
+  );
 
   doc.text(
     "Rues parcourues :",
@@ -975,11 +1090,14 @@ async function exportPDF(){
 
   y += 10;
 
-  doc.setFontSize(11);
+  doc.setFont(
+    "helvetica",
+    "normal"
+  );
 
   streets.forEach(street=>{
 
-    if(y > 270){
+    if(y > 275){
 
       doc.addPage();
 
@@ -988,39 +1106,6 @@ async function exportPDF(){
 
     doc.text(
       "• " + street,
-      20,
-      y
-    );
-
-    y += 7;
-
-  });
-
-  y += 10;
-
-  doc.setFontSize(16);
-
-  doc.text(
-    "Quartiers :",
-    20,
-    y
-  );
-
-  y += 10;
-
-  doc.setFontSize(11);
-
-  districts.forEach(d=>{
-
-    if(y > 270){
-
-      doc.addPage();
-
-      y = 20;
-    }
-
-    doc.text(
-      "• " + d,
       20,
       y
     );
