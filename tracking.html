@@ -1,100 +1,92 @@
-<!DOCTYPE html>
 <html lang="fr">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      points++;
 
-  <title>PNT GPS</title>
+      document.getElementById("distance").innerText =
+        totalDistance.toFixed(2) + " km";
 
-  <style>
+      document.getElementById("speed").innerText =
+        speed + " km/h";
 
-    * {
-      margin:0;
-      padding:0;
-      box-sizing:border-box;
+      document.getElementById("points").innerText =
+        points;
+
+      await fetch("/gps", {
+
+        method: "POST",
+
+        headers: {
+          "Content-Type": "application/json"
+        },
+
+        body: JSON.stringify({
+
+          lat,
+          lng,
+          speed,
+          distance: totalDistance,
+          points,
+          timestamp: new Date()
+
+        })
+      });
+
+    },
+
+    (error) => {
+
+      document.getElementById("status").innerText =
+        "Erreur GPS : " + error.message;
+    },
+
+    {
+      enableHighAccuracy: true,
+      maximumAge: 0,
+      timeout: 5000
     }
+  );
+}
 
-    body {
-      background:#050816;
-      color:white;
-      font-family:Arial,sans-serif;
-      min-height:100vh;
-      padding:25px;
-    }
+function pauseTracking() {
 
-    .container {
-      max-width:700px;
-      margin:auto;
-    }
+  paused = true;
 
-    .card {
-      background:#0F172A;
-      border-radius:28px;
-      padding:30px;
-      border:1px solid rgba(255,255,255,0.08);
-      box-shadow:0 0 30px rgba(168,85,247,0.15);
-    }
+  document.getElementById("status").innerText =
+    "Tracking en pause.";
+}
 
-    h1 {
-      font-size:42px;
-      margin-bottom:15px;
-      background:linear-gradient(90deg,#A855F7,#EC4899);
-      -webkit-background-clip:text;
-      -webkit-text-fill-color:transparent;
-    }
+function resumeTracking() {
 
-    .subtitle {
-      color:#94A3B8;
-      margin-bottom:30px;
-      line-height:1.7;
-    }
+  paused = false;
 
-    .stats {
-      display:grid;
-      grid-template-columns:1fr 1fr;
-      gap:15px;
-    }
+  document.getElementById("status").innerText =
+    "Tracking repris.";
+}
 
-    .stat {
-      background:#111827;
-      border-radius:18px;
-      padding:20px;
-    }
+function stopTracking() {
 
-    .label {
-      color:#94A3B8;
-      font-size:13px;
-      margin-bottom:10px;
-    }
+  tracking = false;
 
-    .value {
-      font-size:28px;
-      font-weight:bold;
-    }
+  navigator.geolocation.clearWatch(watchId);
 
-    .buttons {
-      display:flex;
-      flex-wrap:wrap;
-      gap:12px;
-      margin-top:25px;
-    }
+  document.getElementById("status").innerText =
+    "Mission terminée.";
 
-    button {
-      border:none;
-      border-radius:16px;
-      padding:16px 22px;
-      color:white;
-      font-size:16px;
-      font-weight:bold;
-      cursor:pointer;
-    }
+  fetch("/end-session", {
 
-    .start {
-      background:linear-gradient(90deg,#7C3AED,#EC4899);
-    }
+    method: "POST",
 
-    .pause {
-      background:#F59E0B;
-    }
+    headers: {
+      "Content-Type": "application/json"
+    },
 
+    body: JSON.stringify({
+      distance: totalDistance,
+      points
+    })
+  });
+}
+
+</script>
+
+</body>
 </html>
