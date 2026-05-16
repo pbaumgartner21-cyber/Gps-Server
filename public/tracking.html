@@ -319,6 +319,11 @@ button:hover{
   color:#E2E8F0;
 }
 
+.leaflet-control-zoom{
+
+  display:none;
+}
+
 @media(max-width:768px){
 
   .top{
@@ -478,9 +483,15 @@ button:hover{
 
 <script>
 
-const map = L.map('map').setView(
+const map = L.map('map',{
+
+  zoomControl:false
+
+}).setView(
+
   [47.322,5.041],
   13
+
 );
 
 L.tileLayer(
@@ -509,8 +520,6 @@ let startTime = null;
 let totalDistance = 0;
 
 let lastPosition = null;
-
-let gpsHistory = [];
 
 let streets = new Set();
 
@@ -669,11 +678,6 @@ function startTracking(){
         lat,
         lng
       ],17);
-
-      gpsHistory.push({
-        lat,
-        lng
-      });
 
       await reverseGeocode(
         lat,
@@ -877,19 +881,15 @@ function stopTracking(){
 
 async function exportPDF(){
 
-  const canvas =
-    await html2canvas(
-      document.getElementById("map")
-    );
-
-  const mapImage =
-    canvas.toDataURL("image/png");
-
   const { jsPDF } =
     window.jspdf;
 
   const doc =
-    new jsPDF();
+    new jsPDF(
+      "portrait",
+      "mm",
+      "a4"
+    );
 
   doc.setFontSize(24);
 
@@ -902,13 +902,13 @@ async function exportPDF(){
   doc.setFontSize(14);
 
   doc.text(
-    "Distance : "
+    "Distance totale : "
     +
     totalDistance.toFixed(2)
     +
     " km",
     20,
-    45
+    40
   );
 
   doc.text(
@@ -916,27 +916,56 @@ async function exportPDF(){
     +
     streets.size,
     20,
-    60
+    52
   );
 
   doc.text(
-    "Quartiers : "
+    "Quartiers traversés : "
     +
     districts.size,
     20,
-    75
+    64
   );
+
+  const mapCanvas =
+    await html2canvas(
+
+      document.querySelector(
+        ".leaflet-map-pane"
+      ),
+
+      {
+
+        useCORS:true
+
+      }
+
+    );
+
+  const mapImage =
+    mapCanvas.toDataURL(
+      "image/png"
+    );
 
   doc.addImage(
+
     mapImage,
+
     "PNG",
+
     15,
-    90,
+
+    80,
+
     180,
+
     90
+
   );
 
-  let y = 195;
+  let y = 185;
+
+  doc.setFontSize(16);
 
   doc.text(
     "Rues parcourues :",
@@ -946,15 +975,58 @@ async function exportPDF(){
 
   y += 10;
 
+  doc.setFontSize(11);
+
   streets.forEach(street=>{
 
+    if(y > 270){
+
+      doc.addPage();
+
+      y = 20;
+    }
+
     doc.text(
-      "- " + street,
+      "• " + street,
       20,
       y
     );
 
-    y += 8;
+    y += 7;
+
+  });
+
+  y += 10;
+
+  doc.setFontSize(16);
+
+  doc.text(
+    "Quartiers :",
+    20,
+    y
+  );
+
+  y += 10;
+
+  doc.setFontSize(11);
+
+  districts.forEach(d=>{
+
+    if(y > 270){
+
+      doc.addPage();
+
+      y = 20;
+    }
+
+    doc.text(
+      "• " + d,
+      20,
+      y
+    );
+
+    y += 7;
+
   });
 
   doc.save(
