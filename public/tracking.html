@@ -23,6 +23,10 @@ src="https://unpkg.com/leaflet/dist/leaflet.js">
 src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js">
 </script>
 
+<script
+src="https://html2canvas.hertzen.com/dist/html2canvas.min.js">
+</script>
+
 <style>
 
 *{
@@ -33,9 +37,14 @@ src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js">
 
 body{
 
-  font-family:Arial,sans-serif;
+  font-family:Inter,Arial,sans-serif;
 
-  background:#050816;
+  background:
+    linear-gradient(
+      180deg,
+      #07111F 0%,
+      #0B1220 100%
+    );
 
   color:white;
 
@@ -44,7 +53,7 @@ body{
 
 .container{
 
-  max-width:1200px;
+  max-width:1250px;
 
   margin:auto;
 
@@ -53,42 +62,74 @@ body{
 
 .hero{
 
-  background:#0F172A;
+  background:
+    rgba(15,23,42,0.82);
 
-  border-radius:32px;
+  backdrop-filter:blur(14px);
+
+  border-radius:34px;
 
   padding:35px;
 
   border:1px solid rgba(255,255,255,0.08);
 
   box-shadow:
-    0 0 50px rgba(168,85,247,0.2);
+    0 0 60px rgba(99,102,241,0.15);
 }
 
-h1{
+.top{
 
-  font-size:64px;
+  display:flex;
 
-  margin-bottom:15px;
+  justify-content:space-between;
+
+  align-items:center;
+
+  margin-bottom:25px;
+}
+
+.logo{
+
+  font-size:42px;
+
+  font-weight:800;
 
   background:
     linear-gradient(
       90deg,
-      #A855F7,
-      #EC4899
+      #818CF8,
+      #38BDF8
     );
 
   -webkit-background-clip:text;
+
   -webkit-text-fill-color:transparent;
+}
+
+.badge{
+
+  background:
+    rgba(255,255,255,0.06);
+
+  padding:12px 18px;
+
+  border-radius:999px;
+
+  color:#CBD5E1;
+
+  border:
+    1px solid rgba(255,255,255,0.08);
 }
 
 .description{
 
-  color:#CBD5E1;
+  color:#94A3B8;
 
-  line-height:1.7;
+  line-height:1.8;
 
-  font-size:18px;
+  font-size:17px;
+
+  max-width:700px;
 }
 
 .stats{
@@ -96,7 +137,7 @@ h1{
   display:grid;
 
   grid-template-columns:
-    repeat(auto-fit,minmax(220px,1fr));
+    repeat(auto-fit,minmax(240px,1fr));
 
   gap:20px;
 
@@ -105,34 +146,38 @@ h1{
 
 .stat-card{
 
-  background:#111827;
+  background:
+    rgba(255,255,255,0.04);
 
-  padding:24px;
+  padding:26px;
 
   border-radius:24px;
 
-  border:1px solid rgba(255,255,255,0.05);
+  border:
+    1px solid rgba(255,255,255,0.06);
 }
 
 .stat-label{
 
   color:#94A3B8;
 
-  margin-bottom:10px;
+  margin-bottom:12px;
+
+  font-size:14px;
 }
 
 .stat-value{
 
-  font-size:36px;
+  font-size:34px;
 
-  font-weight:bold;
+  font-weight:700;
 }
 
 .buttons{
 
   display:flex;
 
-  gap:15px;
+  gap:14px;
 
   flex-wrap:wrap;
 
@@ -143,15 +188,15 @@ button{
 
   border:none;
 
-  padding:18px 26px;
+  padding:18px 24px;
 
   border-radius:18px;
 
   color:white;
 
-  font-size:16px;
+  font-size:15px;
 
-  font-weight:bold;
+  font-weight:700;
 
   cursor:pointer;
 
@@ -168,20 +213,23 @@ button:hover{
   background:
     linear-gradient(
       90deg,
-      #7C3AED,
-      #EC4899
+      #4F46E5,
+      #06B6D4
     );
 }
 
 .pause{
+
   background:#F59E0B;
 }
 
 .resume{
+
   background:#10B981;
 }
 
 .stop{
+
   background:#EF4444;
 }
 
@@ -189,28 +237,33 @@ button:hover{
 
   margin-top:30px;
 
-  background:#111827;
+  background:
+    rgba(255,255,255,0.04);
 
   padding:22px;
 
-  border-radius:20px;
+  border-radius:22px;
 
   color:#CBD5E1;
+
+  border:
+    1px solid rgba(255,255,255,0.06);
 }
 
 #map{
 
-  height:500px;
+  height:550px;
 
   width:100%;
 
   margin-top:35px;
 
-  border-radius:28px;
+  border-radius:30px;
 
   overflow:hidden;
 
-  border:1px solid rgba(255,255,255,0.08);
+  border:
+    1px solid rgba(255,255,255,0.08);
 }
 
 #summary{
@@ -220,35 +273,62 @@ button:hover{
 
 .summary-card{
 
-  background:#111827;
+  background:
+    rgba(255,255,255,0.04);
 
-  border-radius:28px;
+  border-radius:30px;
 
-  padding:30px;
+  padding:35px;
 
-  border:1px solid rgba(255,255,255,0.08);
+  border:
+    1px solid rgba(255,255,255,0.08);
 }
 
 .summary-card h2{
 
-  font-size:38px;
+  font-size:42px;
 
-  margin-bottom:20px;
+  margin-bottom:25px;
 }
 
 .summary-card p{
 
-  margin-bottom:12px;
-
   color:#CBD5E1;
 
-  font-size:17px;
+  margin-bottom:14px;
+
+  line-height:1.7;
+}
+
+.street-list{
+
+  margin-top:20px;
+
+  padding:20px;
+
+  border-radius:22px;
+
+  background:
+    rgba(255,255,255,0.03);
+}
+
+.street-item{
+
+  margin-bottom:10px;
+
+  color:#E2E8F0;
 }
 
 @media(max-width:768px){
 
-  h1{
-    font-size:46px;
+  .top{
+    flex-direction:column;
+    align-items:flex-start;
+    gap:15px;
+  }
+
+  .logo{
+    font-size:34px;
   }
 
   .buttons{
@@ -260,7 +340,7 @@ button:hover{
   }
 
   #map{
-    height:400px;
+    height:420px;
   }
 }
 
@@ -274,12 +354,23 @@ button:hover{
 
   <div class="hero">
 
-    <h1>PNT GPS</h1>
+    <div class="top">
+
+      <div class="logo">
+        PNT GPS
+      </div>
+
+      <div class="badge">
+        Tracking professionnel
+      </div>
+
+    </div>
 
     <div class="description">
 
-      Système professionnel de suivi GPS
-      des tournées PNT Fly Dijon.
+      Système avancé de suivi GPS
+      des tournées de distribution
+      PNT Fly Dijon.
 
     </div>
 
@@ -300,7 +391,7 @@ button:hover{
       <div class="stat-card">
 
         <div class="stat-label">
-          Distance
+          Distance totale
         </div>
 
         <div class="stat-value" id="distance">
@@ -312,23 +403,11 @@ button:hover{
       <div class="stat-card">
 
         <div class="stat-label">
-          Vitesse
+          Rues parcourues
         </div>
 
-        <div class="stat-value" id="speed">
-          0 km/h
-        </div>
-
-      </div>
-
-      <div class="stat-card">
-
-        <div class="stat-label">
-          Vitesse moyenne
-        </div>
-
-        <div class="stat-value" id="avgSpeed">
-          0 km/h
+        <div class="stat-value" id="streetCount">
+          0
         </div>
 
       </div>
@@ -336,22 +415,10 @@ button:hover{
       <div class="stat-card">
 
         <div class="stat-label">
-          Vitesse max
+          Quartiers détectés
         </div>
 
-        <div class="stat-value" id="maxSpeed">
-          0 km/h
-        </div>
-
-      </div>
-
-      <div class="stat-card">
-
-        <div class="stat-label">
-          Points GPS
-        </div>
-
-        <div class="stat-value" id="points">
+        <div class="stat-value" id="districts">
           0
         </div>
 
@@ -426,12 +493,13 @@ L.tileLayer(
 let polyline = L.polyline(
   [],
   {
-    color:'#A855F7',
-    weight:5
+    color:'#38BDF8',
+    weight:6
   }
 ).addTo(map);
 
 let tracking = false;
+
 let paused = false;
 
 let watchId = null;
@@ -440,17 +508,13 @@ let startTime = null;
 
 let totalDistance = 0;
 
-let points = 0;
-
 let lastPosition = null;
 
-let maxSpeed = 0;
-
-let totalSpeed = 0;
-
-let speedSamples = 0;
-
 let gpsHistory = [];
+
+let streets = new Set();
+
+let districts = new Set();
 
 function calculateDistance(
   lat1,
@@ -490,7 +554,6 @@ function calculateDistance(
     Math.sin(dLon/2);
 
   const c =
-
     2 * Math.atan2(
       Math.sqrt(a),
       Math.sqrt(1-a)
@@ -505,7 +568,6 @@ function updateTime(){
   return;
 
   const seconds =
-
     Math.floor(
       (Date.now()-startTime)
       / 1000
@@ -521,6 +583,55 @@ function updateTime(){
 
 setInterval(updateTime,1000);
 
+async function reverseGeocode(
+  lat,
+  lng
+){
+
+  try{
+
+    const response =
+      await fetch(
+
+      `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`
+
+    );
+
+    const data =
+      await response.json();
+
+    if(data.address.road){
+
+      streets.add(
+        data.address.road
+      );
+    }
+
+    if(
+      data.address.suburb
+    ){
+
+      districts.add(
+        data.address.suburb
+      );
+    }
+
+    document.getElementById(
+      "streetCount"
+    ).innerText =
+      streets.size;
+
+    document.getElementById(
+      "districts"
+    ).innerText =
+      districts.size;
+
+  }catch(e){
+
+    console.log(e);
+  }
+}
+
 function startTracking(){
 
   if(tracking) return;
@@ -531,8 +642,9 @@ function startTracking(){
 
   startTime = Date.now();
 
-  document.getElementById("status")
-  .innerText =
+  document.getElementById(
+    "status"
+  ).innerText =
     "Tracking GPS actif...";
 
   watchId =
@@ -548,21 +660,6 @@ function startTracking(){
       const lng =
         position.coords.longitude;
 
-      const speed =
-
-        position.coords.speed
-
-        ?
-
-        (
-          position.coords.speed
-          * 3.6
-        ).toFixed(1)
-
-        :
-
-        0;
-
       polyline.addLatLng([
         lat,
         lng
@@ -574,29 +671,14 @@ function startTracking(){
       ],17);
 
       gpsHistory.push({
-
         lat,
-        lng,
-        speed,
-        time:new Date()
-
+        lng
       });
 
-      if(speed > maxSpeed){
-
-        maxSpeed = speed;
-      }
-
-      totalSpeed +=
-        Number(speed);
-
-      speedSamples++;
-
-      const averageSpeed =
-
-        totalSpeed
-        /
-        speedSamples;
+      await reverseGeocode(
+        lat,
+        lng
+      );
 
       if(lastPosition){
 
@@ -616,39 +698,12 @@ function startTracking(){
         lng
       };
 
-      points++;
-
       document.getElementById(
         "distance"
       ).innerText =
 
         totalDistance.toFixed(2)
         + " km";
-
-      document.getElementById(
-        "speed"
-      ).innerText =
-
-        speed + " km/h";
-
-      document.getElementById(
-        "avgSpeed"
-      ).innerText =
-
-        averageSpeed.toFixed(1)
-        + " km/h";
-
-      document.getElementById(
-        "maxSpeed"
-      ).innerText =
-
-        maxSpeed
-        + " km/h";
-
-      document.getElementById(
-        "points"
-      ).innerText =
-        points;
 
       await fetch("/gps",{
 
@@ -663,9 +718,7 @@ function startTracking(){
 
           lat,
           lng,
-          speed,
           distance:totalDistance,
-          points,
           timestamp:new Date()
 
         })
@@ -695,8 +748,9 @@ function pauseTracking(){
 
   paused = true;
 
-  document.getElementById("status")
-  .innerText =
+  document.getElementById(
+    "status"
+  ).innerText =
     "Tracking en pause.";
 }
 
@@ -704,8 +758,9 @@ function resumeTracking(){
 
   paused = false;
 
-  document.getElementById("status")
-  .innerText =
+  document.getElementById(
+    "status"
+  ).innerText =
     "Tracking repris.";
 }
 
@@ -717,12 +772,7 @@ function stopTracking(){
     watchId
   );
 
-  document.getElementById("status")
-  .innerText =
-    "Mission terminée.";
-
   const duration =
-
     Math.floor(
       (
         Date.now()
@@ -735,11 +785,30 @@ function stopTracking(){
       60
     );
 
-  const averageSpeed =
+  document.getElementById(
+    "status"
+  ).innerText =
+    "Mission terminée.";
 
-    totalSpeed
-    /
-    speedSamples;
+  let streetsHtml = "";
+
+  streets.forEach(street=>{
+
+    streetsHtml +=
+      `<div class="street-item">
+        • ${street}
+      </div>`;
+  });
+
+  let districtHtml = "";
+
+  districts.forEach(d=>{
+
+    districtHtml +=
+      `<div class="street-item">
+        • ${d}
+      </div>`;
+  });
 
   document.getElementById(
     "summary"
@@ -758,24 +827,39 @@ function stopTracking(){
     </p>
 
     <p>
-      Distance :
+      Distance totale :
       ${totalDistance.toFixed(2)} km
     </p>
 
     <p>
-      Vitesse moyenne :
-      ${averageSpeed.toFixed(1)} km/h
+      Nombre de rues :
+      ${streets.size}
     </p>
 
     <p>
-      Vitesse max :
-      ${maxSpeed} km/h
+      Quartiers traversés :
+      ${districts.size}
     </p>
 
-    <p>
-      Points GPS :
-      ${points}
-    </p>
+    <div class="street-list">
+
+      <h3>
+        Quartiers détectés
+      </h3>
+
+      ${districtHtml}
+
+    </div>
+
+    <div class="street-list">
+
+      <h3>
+        Rues parcourues
+      </h3>
+
+      ${streetsHtml}
+
+    </div>
 
     <button
       class="start"
@@ -793,13 +877,21 @@ function stopTracking(){
 
 async function exportPDF(){
 
+  const canvas =
+    await html2canvas(
+      document.getElementById("map")
+    );
+
+  const mapImage =
+    canvas.toDataURL("image/png");
+
   const { jsPDF } =
     window.jspdf;
 
   const doc =
     new jsPDF();
 
-  doc.setFontSize(26);
+  doc.setFontSize(24);
 
   doc.text(
     "PNT Fly Dijon",
@@ -816,37 +908,57 @@ async function exportPDF(){
     +
     " km",
     20,
-    50
+    45
   );
 
   doc.text(
-    "Points GPS : "
+    "Nombre de rues : "
     +
-    points,
+    streets.size,
     20,
-    65
+    60
   );
 
   doc.text(
-    "Vitesse max : "
+    "Quartiers : "
     +
-    maxSpeed
-    +
-    " km/h",
+    districts.size,
     20,
-    80
+    75
   );
 
-  doc.text(
-    "Date : "
-    +
-    new Date().toLocaleString(),
-    20,
-    95
+  doc.addImage(
+    mapImage,
+    "PNG",
+    15,
+    90,
+    180,
+    90
   );
+
+  let y = 195;
+
+  doc.text(
+    "Rues parcourues :",
+    20,
+    y
+  );
+
+  y += 10;
+
+  streets.forEach(street=>{
+
+    doc.text(
+      "- " + street,
+      20,
+      y
+    );
+
+    y += 8;
+  });
 
   doc.save(
-    "pnt-tracking.pdf"
+    "pnt-tournee.pdf"
   );
 }
 
