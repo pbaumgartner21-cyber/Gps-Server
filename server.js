@@ -1,7 +1,6 @@
 const express = require("express");
 const cors = require("cors");
 const fs = require("fs");
-const path = require("path");
 
 const app = express();
 
@@ -34,4 +33,53 @@ function saveData(data) {
 }
 
 app.post("/gps", (req, res) => {
+
+  const data = readData();
+
+  const gpsPoint = {
+
+    ...req.body,
+
+    serverTime: new Date()
+  };
+
+  data.push(gpsPoint);
+
+  saveData(data);
+
+  console.log("GPS RECEIVED");
+
+  res.json({
+    success: true
+  });
+});
+
+app.post("/end-session", (req, res) => {
+
+  console.log("MISSION TERMINÉE");
+
+  console.log(req.body);
+
+  res.json({
+    success: true
+  });
+});
+
+app.get("/history", (req, res) => {
+
+  const data = readData();
+
+  res.json(data);
+});
+
+app.get("/", (req, res) => {
+
+  res.sendFile(__dirname + "/public/tracking.html");
+});
+
+const PORT = process.env.PORT || 3000;
+
+app.listen(PORT, () => {
+
+  console.log(`SERVER RUNNING ON ${PORT}`);
 });
